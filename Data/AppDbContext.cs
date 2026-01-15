@@ -1,3 +1,4 @@
+using FinanceTracker.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceTracker.Data;
@@ -8,4 +9,5 @@ public class AppDbContext : DbContext
   {
   }
 
+  public DbSet<User> Users => Set<User>();
 }
