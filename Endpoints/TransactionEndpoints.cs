@@ -21,7 +21,7 @@ public static class TransactionEndpoints
         var exists = await db.Accounts.AnyAsync(account => account.Id == newTransaction.FromAccountId && account.UserId == userId);
         if (!exists)
         {
-          return Results.BadRequest("Invalid From Account");
+          return Results.BadRequest("Invalid Source Account");
         }
       }
 
@@ -30,7 +30,7 @@ public static class TransactionEndpoints
         var exists = await db.Accounts.AnyAsync(account => account.Id == newTransaction.ToAccountId && account.UserId == userId);
         if (!exists)
         {
-          return Results.BadRequest("Invalid To Account");
+          return Results.BadRequest("Invalid Destination Account");
         }
       }
 

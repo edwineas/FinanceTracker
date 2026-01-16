@@ -40,6 +40,28 @@ public static class AccountEndpoints
       return Results.Ok(accounts);
     });
 
+    group.MapGet("/{id}/balance", async (Guid id, ClaimsPrincipal user, AppDbContext db) =>
+    {
+      var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+
+      var exists = await db.Accounts.AnyAsync(account => account.Id == id && account.UserId == userId);
+
+      if (!exists)
+      {
+        return Results.NotFound();
+      }
+
+      var balance = await db.Transactions.Where(transaction => transaction.UserId == userId)
+        .SumAsync(transaction =>
+          (transaction.Type == "Income" && transaction.ToAccountId == id ? transaction.Amount : 0) +
+          (transaction.Type == "Transfer" && transaction.ToAccountId == id ? transaction.Amount : 0) -
+          (transaction.Type == "Expense" && transaction.FromAccountId == id ? transaction.Amount : 0) -
+          (transaction.Type == "Transfer" && transaction.FromAccountId == id ? transaction.Amount : 0)
+        );
+
+      return Results.Ok( new { balance });
+    });
+
     return app;
   }
 }
