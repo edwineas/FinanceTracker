@@ -1,8 +1,12 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using FinanceTracker.Data;
 using FinanceTracker.Data.Models;
 using FinanceTracker.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FinanceTracker.Endpoints;
 
@@ -35,6 +39,45 @@ public static class AuthEndpoints
 
       return Results.Created();
 
+    });
+
+    group.MapPost("/login", async (LoginUserRequest loginUser, AppDbContext db, IPasswordHasher<User> passwordHasher, IConfiguration config) =>
+    {
+      var user = await db.Users.FirstOrDefaultAsync(user => user.Email == loginUser.Email);
+      if (user == null)
+      {
+        return Results.Unauthorized();
+      }
+
+
+      var result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginUser.Password);
+      if (result == PasswordVerificationResult.Failed)
+      {
+        return Results.Unauthorized();
+      }
+
+
+      var issuer = config["Jwt:Issuer"];
+      var audience = config["Jwt:Audience"];
+      var key = Encoding.UTF8.GetBytes(config["Jwt:Key"]!);
+      var tokenDescriptor = new SecurityTokenDescriptor
+      {
+        Subject = new ClaimsIdentity(new[]
+        {
+          new Claim("Id", Guid.NewGuid().ToString()),
+          new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+          new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        }),
+        Expires = DateTime.UtcNow.AddMinutes(5),
+        Issuer = issuer,
+        Audience = audience,
+        SigningCredentials =
+          new SigningCredentials(
+            new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+      };
+      var tokenHandler = new JwtSecurityTokenHandler();
+      var token = tokenHandler.CreateToken(tokenDescriptor);
+      return Results.Ok(new { accessToken = tokenHandler.WriteToken(token) });
     });
 
     return app;
