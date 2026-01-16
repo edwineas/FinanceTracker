@@ -45,5 +45,6 @@ app.MapHealthEndpoints();
 app.MapAuthEndpoints();
 app.MapAccountEndpoints();
 app.MapCategoryEndpoints();
+app.MapTransactionEndpoints();
 
 app.Run();
