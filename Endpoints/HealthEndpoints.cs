@@ -1,3 +1,5 @@
+using System.Security.Claims;
+
 namespace FinanceTracker.Endpoints;
 
 public static class HealthEndpoints
@@ -5,7 +7,7 @@ public static class HealthEndpoints
   public static IEndpointRouteBuilder MapHealthEndpoints(this IEndpointRouteBuilder app)
   {
     
-    app.MapGet("/", () => "Hello from Project").RequireAuthorization();
+    app.MapGet("/", () => "Hello from Project");
 
     app.MapGet("/health", () => new { status = "Healthy", timestamp = DateTime.UtcNow });
 
