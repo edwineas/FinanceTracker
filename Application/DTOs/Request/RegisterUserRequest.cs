@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace FinanceTracker.Application.DTOs;
+namespace FinanceTracker.Application.DTOs.Request;
 public class RegisterUserRequest
 {
   [Required]

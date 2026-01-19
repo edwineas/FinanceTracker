@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using FinanceTracker.Infrasturecture.Data;
 using FinanceTracker.Domain.Entities;
-using FinanceTracker.Application.DTOs;
+using FinanceTracker.Application.DTOs.Request;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
