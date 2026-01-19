@@ -3,6 +3,7 @@ using FinanceTracker.Infrasturecture.Data;
 using FinanceTracker.Domain.Entities;
 using FinanceTracker.Application.DTOs.Request;
 using Microsoft.EntityFrameworkCore;
+using FinanceTracker.Application.Services.Interfaces;
 
 namespace FinanceTracker.API.Endpoints;
 
@@ -12,91 +13,30 @@ public static class TransactionEndpoints
   {
     var group = app.MapGroup("/transactions").RequireAuthorization();
 
-    group.MapPost("/", async (CreateTransactionRequest newTransaction, ClaimsPrincipal user, AppDbContext db) =>
+    group.MapPost("/", async (CreateTransactionRequest newTransaction, ClaimsPrincipal user, ITransactionService transactionService) =>
     {
       var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
 
-      if (newTransaction.FromAccountId.HasValue)
-      {
-        var exists = await db.Accounts.AnyAsync(account => account.Id == newTransaction.FromAccountId && account.UserId == userId);
-        if (!exists)
-        {
-          return Results.BadRequest("Invalid Source Account");
-        }
-      }
+      var (success, error, transaction) = await transactionService.CreateAsync(newTransaction, userId);
 
-      if (newTransaction.ToAccountId.HasValue)
-      {
-        var exists = await db.Accounts.AnyAsync(account => account.Id == newTransaction.ToAccountId && account.UserId == userId);
-        if (!exists)
-        {
-          return Results.BadRequest("Invalid Destination Account");
-        }
-      }
+      if (!success) return Results.BadRequest(error);
 
-      if (newTransaction.CategoryId.HasValue)
-      {
-        var exists = await db.Categories.AnyAsync(category => category.Id == newTransaction.CategoryId && category.UserId == userId);
-        if (!exists)
-        {
-          return Results.BadRequest("Invalid category");
-        }
-      }
-
-      var transaction = new Transaction
-      {
-        Id = Guid.NewGuid(),
-        UserId = userId,
-        Type = newTransaction.Type,
-        Amount = newTransaction.Amount!.Value,
-        FromAccountId = newTransaction.FromAccountId,
-        ToAccountId = newTransaction.ToAccountId,
-        CategoryId = newTransaction.CategoryId,
-        Note = newTransaction.Note,
-        Date = newTransaction.Date ?? DateTime.UtcNow,
-        CreatedAt = DateTime.UtcNow
-      };
-
-      db.Transactions.Add(transaction);
-      await db.SaveChangesAsync();
-
-      return Results.Created($"/transactions/{transaction.Id}", transaction);
+      return Results.Created($"/transactions/{transaction!.Id}", transaction);
     });
 
     group.MapGet("/", async (
       string? type,
       Guid? accountId, 
+      Guid? categoryId,
       DateTime? startDate,
       DateTime? endDate,
       ClaimsPrincipal user, 
-      AppDbContext db
+      ITransactionService transactionService
       ) =>
     {
       var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
 
-      var query = db.Transactions.Where(transaction => transaction.UserId == userId).AsQueryable();
-
-      if (!string.IsNullOrWhiteSpace(type))
-      {
-        query = query.Where(transaction => transaction.Type == type);
-      }
-
-      if (accountId.HasValue)
-      {
-        query = query.Where(transaction => transaction.FromAccountId == accountId || transaction.ToAccountId == accountId);
-      }
-
-      if (startDate.HasValue)
-      {
-        query = query.Where(transaction => transaction.Date >= startDate);
-      }
-
-      if (endDate.HasValue)
-      {
-        query = query.Where(transaction => transaction.Date <= endDate);
-      }
-
-      var transactions = await query.OrderByDescending(transaction => transaction.Date).ToListAsync();
+      var (success, error, transactions) = await transactionService.GetAllAsync(userId, type, accountId, categoryId, startDate, endDate);
 
       return Results.Ok(transactions);
 
