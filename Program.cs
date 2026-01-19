@@ -40,6 +40,8 @@ builder.Services.AddScoped<FinanceTracker.Infrastructure.Repositories.Interfaces
 builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.IAuthService, FinanceTracker.Application.Services.AuthService>();
 builder.Services.AddScoped<FinanceTracker.Infrastructure.Repositories.Interfaces.IAccountRepository, FinanceTracker.Infrastructure.Repositories.AccountRepository>();
 builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.IAccountService, FinanceTracker.Application.Services.AccountService>();
+builder.Services.AddScoped<FinanceTracker.Infrastructure.Repositories.Interfaces.ICategoryRepository, FinanceTracker.Infrastructure.Repositories.CategoryRepository>();
+builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.ICategoryService, FinanceTracker.Application.Services.CategoryService>();
 
 var app = builder.Build();
 

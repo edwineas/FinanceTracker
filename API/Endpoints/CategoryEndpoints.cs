@@ -3,6 +3,7 @@ using FinanceTracker.Infrasturecture.Data;
 using FinanceTracker.Domain.Entities;
 using FinanceTracker.Application.DTOs.Request;
 using Microsoft.EntityFrameworkCore;
+using FinanceTracker.Application.Services.Interfaces;
 
 namespace FinanceTracker.API.Endpoints;
 
@@ -12,29 +13,19 @@ public static class CategoryEndpoints
   {
     var group = app.MapGroup("/categories").RequireAuthorization();
 
-    group.MapPost("/", async (CreateCategoryRequest newCategory, ClaimsPrincipal user, AppDbContext db) =>
+    group.MapPost("/", async (CreateCategoryRequest newCategory, ClaimsPrincipal user, ICategoryService categoryService) =>
     {
       var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-
-      var category = new Category
-      {
-        Id = Guid.NewGuid(),
-        UserId = userId,
-        Name = newCategory.Name,
-        CreatedAt = DateTime.UtcNow
-      };
-
-      db.Categories.Add(category);
-      await db.SaveChangesAsync();
+      var category = await categoryService.CreateAsync(newCategory, userId);
 
       return Results.Created($"/categories/{category.Id}", category);
     });
 
-    group.MapGet("/", async (ClaimsPrincipal user, AppDbContext db) =>
+    group.MapGet("/", async (ClaimsPrincipal user, ICategoryService categoryService) =>
     {
       var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
 
-      var categories = await db.Categories.Where(category => category.UserId == userId).ToListAsync();
+      var categories = await categoryService.GetAllAsync(userId);
 
       return Results.Ok(categories);
     });
