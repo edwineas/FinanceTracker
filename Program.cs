@@ -1,7 +1,7 @@
 using System.Text;
-using FinanceTracker.Data;
-using FinanceTracker.Data.Models;
-using FinanceTracker.Endpoints;
+using FinanceTracker.Infrasturecture.Data;
+using FinanceTracker.Domain.Entities;
+using FinanceTracker.API.Endpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
