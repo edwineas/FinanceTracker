@@ -3,6 +3,7 @@ using FinanceTracker.Infrasturecture.Data;
 using FinanceTracker.Domain.Entities;
 using FinanceTracker.Application.DTOs.Request;
 using Microsoft.EntityFrameworkCore;
+using FinanceTracker.Application.Services.Interfaces;
 
 namespace FinanceTracker.API.Endpoints;
 
@@ -12,54 +13,28 @@ public static class AccountEndpoints
   {
     var group = app.MapGroup("/accounts").RequireAuthorization();
 
-    _ = group.MapPost("/", async (CreateAccountRequest newAccount, ClaimsPrincipal user, AppDbContext db) =>
+    group.MapPost("/", async (CreateAccountRequest newAccount, ClaimsPrincipal user, IAccountService accountService) =>
     {
       var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-
-      var account = new Account
-      {
-        Id = Guid.NewGuid(),
-        UserId = userId,
-        Name = newAccount.Name,
-        Type = newAccount.Type,
-        CreatedAt = DateTime.UtcNow
-      };
-
-      db.Accounts.Add(account);
-      await db.SaveChangesAsync();
+      var account = await accountService.CreateAsync(newAccount, userId);
 
       return Results.Created($"/accounts/{account.Id}", new { Name = account.Name, Type = account.Type });
     });
 
-    group.MapGet("/", async (ClaimsPrincipal user, AppDbContext db) =>
+    group.MapGet("/", async (ClaimsPrincipal user, IAccountService accountService) =>
     {
       var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-
-      var accounts = await db.Accounts.Where(account => account.UserId == userId).ToListAsync();
+      var accounts = await accountService.GetAllAsync(userId);
 
       return Results.Ok(accounts);
     });
 
-    group.MapGet("/{id}/balance", async (Guid id, ClaimsPrincipal user, AppDbContext db) =>
+    group.MapGet("/{id}/balance", async (Guid id, ClaimsPrincipal user, IAccountService accountService) =>
     {
       var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+      var balance = await accountService.GetBalanceAsync(id, userId);
 
-      var exists = await db.Accounts.AnyAsync(account => account.Id == id && account.UserId == userId);
-
-      if (!exists)
-      {
-        return Results.NotFound();
-      }
-
-      var balance = await db.Transactions.Where(transaction => transaction.UserId == userId)
-        .SumAsync(transaction =>
-          (transaction.Type == "Income" && transaction.ToAccountId == id ? transaction.Amount : 0) +
-          (transaction.Type == "Transfer" && transaction.ToAccountId == id ? transaction.Amount : 0) -
-          (transaction.Type == "Expense" && transaction.FromAccountId == id ? transaction.Amount : 0) -
-          (transaction.Type == "Transfer" && transaction.FromAccountId == id ? transaction.Amount : 0)
-        );
-
-      return Results.Ok( new { balance });
+      return Results.Ok(new { balance });
     });
 
     return app;

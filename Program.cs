@@ -38,6 +38,8 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<FinanceTracker.Infrastructure.Repositories.Interfaces.IAuthRepository, FinanceTracker.Infrastructure.Repositories.AuthRepository>();
 builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.IAuthService, FinanceTracker.Application.Services.AuthService>();
+builder.Services.AddScoped<FinanceTracker.Infrastructure.Repositories.Interfaces.IAccountRepository, FinanceTracker.Infrastructure.Repositories.AccountRepository>();
+builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.IAccountService, FinanceTracker.Application.Services.AccountService>();
 
 var app = builder.Build();
 
