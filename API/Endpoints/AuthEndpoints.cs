@@ -1,13 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using FinanceTracker.Infrasturecture.Data;
-using FinanceTracker.Domain.Entities;
 using FinanceTracker.Application.DTOs.Request;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using FinanceTracker.Application.Services;
 using FinanceTracker.Application.Services.Interfaces;
 
 namespace FinanceTracker.API.Endpoints;

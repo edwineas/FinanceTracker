@@ -2,7 +2,6 @@ using FinanceTracker.Application.DTOs.Request;
 using FinanceTracker.Application.Services.Interfaces;
 using FinanceTracker.Domain.Entities;
 using FinanceTracker.Infrastructure.Repositories.Interfaces;
-using FinanceTracker.Infrasturecture.Data;
 
 namespace FinanceTracker.Application.Services;
 

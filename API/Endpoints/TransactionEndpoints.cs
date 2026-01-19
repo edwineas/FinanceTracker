@@ -1,8 +1,5 @@
 using System.Security.Claims;
-using FinanceTracker.Infrasturecture.Data;
-using FinanceTracker.Domain.Entities;
 using FinanceTracker.Application.DTOs.Request;
-using Microsoft.EntityFrameworkCore;
 using FinanceTracker.Application.Services.Interfaces;
 
 namespace FinanceTracker.API.Endpoints;
