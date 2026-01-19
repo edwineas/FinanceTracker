@@ -36,6 +36,9 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAuthorization();
 
+builder.Services.AddScoped<FinanceTracker.Infrastructure.Repositories.Interfaces.IAuthRepository, FinanceTracker.Infrastructure.Repositories.AuthRepository>();
+builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.IAuthService, FinanceTracker.Application.Services.AuthService>();
+
 var app = builder.Build();
 
 app.UseAuthentication();

@@ -7,6 +7,8 @@ using FinanceTracker.Application.DTOs.Request;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using FinanceTracker.Application.Services;
+using FinanceTracker.Application.Services.Interfaces;
 
 namespace FinanceTracker.API.Endpoints;
 
@@ -16,68 +18,18 @@ public static class AuthEndpoints
   {
     var group = app.MapGroup("/auth");
 
-    group.MapPost("/register", async (RegisterUserRequest newUser, AppDbContext db, IPasswordHasher<User> passwordHasher) =>
+    group.MapPost("/register", async (RegisterUserRequest newUser, IAuthService authService) =>
     {
-      var exists = await db.Users.AnyAsync(user => user.Email == newUser.Email);
-      if (exists)
-      {
-        return Results.Conflict("User already exists");
-      }
-
-      var user = new User
-      {
-        Id = Guid.NewGuid(),
-        Name = newUser.Name,
-        Email = newUser.Email,
-        CreatedAt = DateTime.UtcNow
-      };
-
-      user.PasswordHash = passwordHasher.HashPassword(user, newUser.Password);
-
-      db.Users.Add(user);
-      await db.SaveChangesAsync();
-
+      var (success, error) = await authService.RegisterUserAsync(newUser);
+      if (!success) return Results.Conflict(error);
       return Results.Created();
-
     });
 
-    group.MapPost("/login", async (LoginUserRequest loginUser, AppDbContext db, IPasswordHasher<User> passwordHasher, IConfiguration config) =>
+    group.MapPost("/login", async (LoginUserRequest loginUser, IAuthService authService) =>
     {
-      var user = await db.Users.FirstOrDefaultAsync(user => user.Email == loginUser.Email);
-      if (user == null)
-      {
-        return Results.Unauthorized();
-      }
-
-
-      var result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginUser.Password);
-      if (result == PasswordVerificationResult.Failed)
-      {
-        return Results.Unauthorized();
-      }
-
-
-      var issuer = config["Jwt:Issuer"];
-      var audience = config["Jwt:Audience"];
-      var key = Encoding.UTF8.GetBytes(config["Jwt:Key"]!);
-      var tokenDescriptor = new SecurityTokenDescriptor
-      {
-        Subject = new ClaimsIdentity(new[]
-        {
-          new Claim("Id", Guid.NewGuid().ToString()),
-          new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-          new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        }),
-        Expires = DateTime.UtcNow.AddMinutes(5),
-        Issuer = issuer,
-        Audience = audience,
-        SigningCredentials =
-          new SigningCredentials(
-            new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
-      };
-      var tokenHandler = new JwtSecurityTokenHandler();
-      var token = tokenHandler.CreateToken(tokenDescriptor);
-      return Results.Ok(new { accessToken = tokenHandler.WriteToken(token) });
+      var (success, token) = await authService.LoginUserAsync(loginUser);
+      if (!success) return Results.Unauthorized();
+      return Results.Ok(new { accessToken = token });
     });
 
     return app;
