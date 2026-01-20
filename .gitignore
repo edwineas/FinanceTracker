@@ -68,6 +68,10 @@ artifacts/
 # Tye
 .tye/
 
+# ASP.NET Core
+Properties/launchSettings.json
+
+
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
