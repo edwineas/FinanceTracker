@@ -23,11 +23,11 @@ public class AuthService : IAuthService
     _config = config;
   }
 
-  public async Task<(bool Success, string? Error)> RegisterUserAsync(RegisterUserRequest request)
+  public async Task<(bool Success, object? Error)> RegisterUserAsync(RegisterUserRequest request)
   {
     if (await _repo.EmailExistsAsync(request.Email))
     {
-      return (false, "User already exists");
+      return (false, new {Email = "User already exists"});
     }
 
     var user = new User

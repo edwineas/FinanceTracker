@@ -18,24 +18,24 @@ public class TransactionService : ITransactionService
     _categoryRepo = categoryRepo;
   }
 
-  public async Task<(bool Success, string? Error, Transaction? Transaction)> CreateAsync(CreateTransactionRequest request, Guid userId)
+  public async Task<(bool Success, object? Error, Transaction? Transaction)> CreateAsync(CreateTransactionRequest request, Guid userId)
   {
     if (request.FromAccountId.HasValue)
     {
       var exists = await _accountRepo.ExistsAsync(request.FromAccountId.Value, userId);
-      if (!exists) return (false, "Invalid Source Account", null);
+      if (!exists) return (false, new { FromAccoutId = "Invalid Source Account" }, null);
     }
 
     if (request.ToAccountId.HasValue)
     {
       var exists = await _accountRepo.ExistsAsync(request.ToAccountId.Value, userId);
-      if (!exists) return (false, "Invalid Destination Account", null);
+      if (!exists) return (false, new { ToAccountId = "Invalid Destination Account" }, null);
     }
 
     if (request.CategoryId.HasValue)
     {
       var exists = await _categoryRepo.ExistsAsync(request.CategoryId.Value, userId);
-      if (!exists) return (false, "Invalid Category", null);
+      if (!exists) return (false, new { CategoryId = "Invalid Category" }, null);
     }
 
     var transaction = new Transaction
@@ -57,18 +57,18 @@ public class TransactionService : ITransactionService
     return (true, null, transaction);
   }
 
-  public async Task<(bool success, string? Error, List<Transaction>? transactions)> GetAllAsync(Guid userId, string? type, Guid? accountId, Guid? categoryId, DateTime? startDate, DateTime? endDate)
+  public async Task<(bool success, object? Error, List<Transaction>? transactions)> GetAllAsync(Guid userId, string? type, Guid? accountId, Guid? categoryId, DateTime? startDate, DateTime? endDate)
   {
     if (accountId.HasValue)
     {
       var exists = await _accountRepo.ExistsAsync(accountId.Value, userId);
-      if (!exists) return (false, "Invalid Source Account", null);
+      if (!exists) return (false, new { AccountId = "Invalid Destination Account" }, null);
     }
 
     if (categoryId.HasValue)
     {
       var exists = await _categoryRepo.ExistsAsync(categoryId.Value, userId);
-      if (!exists) return (false, "Invalid Category", null);
+      if (!exists) return (false, new { CategoryId = "Invalid Category" }, null);
     }
 
     var transactions = await _repo.GetAllAsync(userId, type, accountId, categoryId, startDate, endDate);

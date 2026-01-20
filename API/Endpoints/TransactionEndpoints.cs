@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using FinanceTracker.API.Responses;
 using FinanceTracker.Application.DTOs.Request;
 using FinanceTracker.Application.Services.Interfaces;
 
@@ -16,9 +17,9 @@ public static class TransactionEndpoints
 
       var (success, error, transaction) = await transactionService.CreateAsync(newTransaction, userId);
 
-      if (!success) return Results.BadRequest(error);
+      if (!success) return ApiResults.BadRequest("Transaction Creation Failed", error);
 
-      return Results.Created($"/transactions/{transaction!.Id}", transaction);
+      return ApiResults.Created(transaction);
     });
 
     group.MapGet("/", async (
@@ -35,7 +36,9 @@ public static class TransactionEndpoints
 
       var (success, error, transactions) = await transactionService.GetAllAsync(userId, type, accountId, categoryId, startDate, endDate);
 
-      return Results.Ok(transactions);
+      if (!success) return ApiResults.BadRequest("Transaction Listing Failed", error);
+
+      return ApiResults.Ok(transactions);
 
     });
 

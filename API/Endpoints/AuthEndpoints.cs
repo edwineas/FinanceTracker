@@ -1,3 +1,4 @@
+using FinanceTracker.API.Responses;
 using FinanceTracker.Application.DTOs.Request;
 using FinanceTracker.Application.Services.Interfaces;
 
@@ -12,15 +13,15 @@ public static class AuthEndpoints
     group.MapPost("/register", async (RegisterUserRequest newUser, IAuthService authService) =>
     {
       var (success, error) = await authService.RegisterUserAsync(newUser);
-      if (!success) return Results.Conflict(error);
-      return Results.Created();
+      if (!success) return ApiResults.Conflict("Registeration Failed", error);
+      return ApiResults.Created();
     });
 
     group.MapPost("/login", async (LoginUserRequest loginUser, IAuthService authService) =>
     {
       var (success, token) = await authService.LoginUserAsync(loginUser);
-      if (!success) return Results.Unauthorized();
-      return Results.Ok(new { accessToken = token });
+      if (!success) return ApiResults.Unauthorized("Login Failed", new {general = "Credentials are incorrect"});
+      return ApiResults.Ok(new { accessToken = token });
     });
 
     return app;

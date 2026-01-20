@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using FinanceTracker.API.Responses;
 using FinanceTracker.Application.DTOs.Request;
 using FinanceTracker.Application.Services.Interfaces;
 
@@ -15,7 +16,7 @@ public static class CategoryEndpoints
       var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
       var category = await categoryService.CreateAsync(newCategory, userId);
 
-      return Results.Created($"/categories/{category.Id}", category);
+      return ApiResults.Created(category);
     });
 
     group.MapGet("/", async (ClaimsPrincipal user, ICategoryService categoryService) =>
@@ -24,7 +25,7 @@ public static class CategoryEndpoints
 
       var categories = await categoryService.GetAllAsync(userId);
 
-      return Results.Ok(categories);
+      return ApiResults.Ok(categories);
     });
 
     return app;
