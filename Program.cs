@@ -1,11 +1,11 @@
 using System.Text;
-using FinanceTracker.Infrasturecture.Data;
 using FinanceTracker.Domain.Entities;
 using FinanceTracker.API.Endpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using FinanceTracker.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,5 +55,11 @@ app.MapAuthEndpoints();
 app.MapAccountEndpoints();
 app.MapCategoryEndpoints();
 app.MapTransactionEndpoints();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<FinanceTracker.Infrastructure.Data.AppDbContext>();
+    db.Database.Migrate();
+}
 
 app.Run();

@@ -1,6 +1,6 @@
 using FinanceTracker.Domain.Entities;
 using FinanceTracker.Infrastructure.Repositories.Interfaces;
-using FinanceTracker.Infrasturecture.Data;
+using FinanceTracker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceTracker.Infrastructure.Repositories;

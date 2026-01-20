@@ -1,7 +1,7 @@
 using FinanceTracker.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace FinanceTracker.Infrasturecture.Data;
+namespace FinanceTracker.Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {

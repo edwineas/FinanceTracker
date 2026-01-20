@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace FinanceTracker.Infrasturecture.Data.Migrations
+namespace FinanceTracker.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
     public partial class AddAccounts : Migration

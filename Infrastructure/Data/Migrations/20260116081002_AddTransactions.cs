@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace FinanceTracker.Infrasturecture.Data.Migrations
+namespace FinanceTracker.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
     public partial class AddTransactions : Migration
