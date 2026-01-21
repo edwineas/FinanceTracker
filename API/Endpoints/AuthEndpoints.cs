@@ -12,9 +12,9 @@ public static class AuthEndpoints
 
     group.MapPost("/register", async (RegisterUserRequest newUser, IAuthService authService) =>
     {
-      var (success, error) = await authService.RegisterUserAsync(newUser);
+      var (success, error, token) = await authService.RegisterUserAsync(newUser);
       if (!success) return ApiResults.Conflict("Registeration Failed", error);
-      return ApiResults.Created();
+      return ApiResults.Created( new { accessToken = token });
     });
 
     group.MapPost("/login", async (LoginUserRequest loginUser, IAuthService authService) =>

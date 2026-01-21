@@ -23,11 +23,11 @@ public class AuthService : IAuthService
     _config = config;
   }
 
-  public async Task<(bool Success, object? Error)> RegisterUserAsync(RegisterUserRequest request)
+  public async Task<(bool Success, object? Error, string? Token)> RegisterUserAsync(RegisterUserRequest request)
   {
     if (await _repo.EmailExistsAsync(request.Email))
     {
-      return (false, new {Email = "User already exists"});
+      return (false, new {Email = "User already exists"}, null);
     }
 
     var user = new User
@@ -39,9 +39,10 @@ public class AuthService : IAuthService
     };
 
     user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
-
     await _repo.AddUserAsync(user);
-    return (true, null);
+
+    var token = GenerateJwtToken(user);
+    return (true, null, token);
   }
 
   public async Task<(bool Success, string? Token)> LoginUserAsync(LoginUserRequest request)
@@ -53,6 +54,13 @@ public class AuthService : IAuthService
     var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
     if (result == PasswordVerificationResult.Failed) return (false, null);
 
+    var token = GenerateJwtToken(user);
+
+    return (true, token);
+  }
+
+  private string GenerateJwtToken(User user)
+  {
     var issuer = _config["Jwt:Issuer"];
     var audience = _config["Jwt:Audience"];
     var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
@@ -73,7 +81,6 @@ public class AuthService : IAuthService
     };
     var tokenHandler = new JwtSecurityTokenHandler();
     var token = tokenHandler.CreateToken(tokenDescriptor);
-
-    return (true, tokenHandler.WriteToken(token));
+    return tokenHandler.WriteToken(token);
   }
 }
