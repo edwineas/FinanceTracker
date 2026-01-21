@@ -27,7 +27,7 @@ public class AuthService : IAuthService
   {
     if (await _repo.EmailExistsAsync(request.Email))
     {
-      return (false, new {Email = "User already exists"}, null);
+      return (false, new {Email = new[] {"User already exists"}}, null);
     }
 
     var user = new User

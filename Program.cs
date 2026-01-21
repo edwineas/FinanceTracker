@@ -36,6 +36,24 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAuthorization();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins", policy =>
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.WithOrigins("http://localhost:4200");
+        }
+        else
+        {
+            policy.WithOrigins("https://financetracker.edwinalexshaji.live");
+        }
+        policy.AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddScoped<FinanceTracker.Infrastructure.Repositories.Interfaces.IAuthRepository, FinanceTracker.Infrastructure.Repositories.AuthRepository>();
 builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.IAuthService, FinanceTracker.Application.Services.AuthService>();
 builder.Services.AddScoped<FinanceTracker.Infrastructure.Repositories.Interfaces.IAccountRepository, FinanceTracker.Infrastructure.Repositories.AccountRepository>();
@@ -48,6 +66,7 @@ builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.ITrans
 var app = builder.Build();
 
 app.UseAuthentication();
+app.UseCors("AllowSpecificOrigins");
 app.UseAuthorization();
 
 app.MapHealthEndpoints();

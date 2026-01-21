@@ -20,7 +20,7 @@ public static class AuthEndpoints
     group.MapPost("/login", async (LoginUserRequest loginUser, IAuthService authService) =>
     {
       var (success, token) = await authService.LoginUserAsync(loginUser);
-      if (!success) return ApiResults.Unauthorized("Login Failed", new {general = "Credentials are incorrect"});
+      if (!success) return ApiResults.Unauthorized("Login Failed", new {general = new[] {"Credentials are incorrect"}});
       return ApiResults.Ok(new { accessToken = token });
     });
 
