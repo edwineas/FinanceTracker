@@ -35,6 +35,14 @@ public static class AccountEndpoints
       return ApiResults.Ok(new { balance });
     });
 
+    group.MapGet("/balances", async (ClaimsPrincipal user, IAccountService accountService) =>
+    {
+      var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+      var accounts = await accountService.GetAllWithBalancesAsync(userId);
+
+      return ApiResults.Ok(new { accounts });
+    });
+
     return app;
   }
 }

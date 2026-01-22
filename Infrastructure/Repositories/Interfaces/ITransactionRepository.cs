@@ -9,4 +9,5 @@ public interface ITransactionRepository
   Task<List<Transaction>> GetAllAsync(Guid userId, string? type, Guid? accountId, Guid? categoryId, DateTime? startDate, DateTime? endDate);
   Task<decimal> GetTotalIncomeAsync(Guid userId, DateTime startDate, DateTime endDate);
   Task<decimal> GetTotalExpenseAsync(Guid userId, DateTime startDate, DateTime endDate);
+  Task<List<Transaction>> GetByAccountIdsAsync(Guid userId, List<Guid> accountIds);
 }

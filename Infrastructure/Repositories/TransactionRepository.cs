@@ -40,4 +40,8 @@ public class TransactionRepository : ITransactionRepository
       .Where(transaction => transaction.UserId == userId && transaction.Type == "Expense" && transaction.Date >= startDate && transaction.Date <= endDate)
         .SumAsync(transaction => transaction.Amount);
 
+  public async Task<List<Transaction>> GetByAccountIdsAsync(Guid userId, List<Guid> accountIds) => 
+    await _db.Transactions
+      .Where(transaction => transaction.UserId == userId && (accountIds.Contains(transaction.FromAccountId ?? Guid.Empty) || accountIds.Contains(transaction.ToAccountId ?? Guid.Empty)))
+        .ToListAsync();
 }
