@@ -12,4 +12,8 @@ public class Transaction
   public string? Note { get; set; }
   public DateTime Date { get; set; }
   public DateTime CreatedAt { get; set; }
+
+  public Category? Category { get; set; }
+  public Account? FromAccount { get; set; }
+  public Account? ToAccount { get; set; }
 }

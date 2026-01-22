@@ -1,4 +1,5 @@
 using FinanceTracker.Application.DTOs.Request;
+using FinanceTracker.Application.DTOs.Response;
 using FinanceTracker.Application.Services.Interfaces;
 using FinanceTracker.Domain.Entities;
 using FinanceTracker.Infrastructure.Repositories.Interfaces;
@@ -74,5 +75,24 @@ public class TransactionService : ITransactionService
     var transactions = await _repo.GetAllAsync(userId, type, accountId, categoryId, startDate, endDate);
 
     return (true, null, transactions);
+  }
+
+  public async Task<List<TransactionSummaryResponse>> GetLatestAsync(Guid userId, int limit)
+  {
+    var transaction = await _repo.GetLatestAsync(userId, limit);
+    return transaction.Select(transaction => new TransactionSummaryResponse
+    {
+      Date = transaction.Date,
+      Type = transaction.Type,
+      Category = transaction.Category?.Name ?? string.Empty,
+      Amount = transaction.Amount,
+      Account = transaction.Type switch
+      {
+        "Income" => transaction.ToAccount?.Name ?? string.Empty,
+        "Expense" => transaction.FromAccount?.Name ?? string.Empty,
+        "Transfer" => transaction.FromAccount?.Name ?? string.Empty,
+        _ => string.Empty
+      }
+    }).ToList();
   }
 }

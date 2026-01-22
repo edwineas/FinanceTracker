@@ -44,4 +44,14 @@ public class TransactionRepository : ITransactionRepository
     await _db.Transactions
       .Where(transaction => transaction.UserId == userId && (accountIds.Contains(transaction.FromAccountId ?? Guid.Empty) || accountIds.Contains(transaction.ToAccountId ?? Guid.Empty)))
         .ToListAsync();
+
+  public async Task<List<Transaction>> GetLatestAsync(Guid userId, int limit) =>
+    await _db.Transactions
+      .Where(transaction => transaction.UserId == userId)
+      .Include(transaction => transaction.Category)
+      .Include(transaction => transaction.FromAccount)
+      .Include(transaction => transaction.ToAccount)
+      .OrderByDescending(transaction => transaction.Date)
+      .Take(limit)
+      .ToListAsync();
 }

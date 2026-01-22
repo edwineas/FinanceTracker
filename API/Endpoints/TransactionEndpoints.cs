@@ -42,6 +42,14 @@ public static class TransactionEndpoints
 
     });
 
+    group.MapGet("/latest", async (int? limit, ClaimsPrincipal user, ITransactionService transactionService) =>
+    {
+      var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+      var transactions = await transactionService.GetLatestAsync(userId, limit ?? 5);
+
+      return ApiResults.Ok(transactions);
+    });
+
     return app;
   }
 }
