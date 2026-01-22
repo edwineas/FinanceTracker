@@ -30,4 +30,14 @@ public class TransactionRepository : ITransactionRepository
     return await query.OrderByDescending(transaction => transaction.Date).ToListAsync();
   }
 
+  public async Task<decimal> GetTotalIncomeAsync(Guid userId, DateTime startDate, DateTime endDate) =>
+    await _db.Transactions
+      .Where(transaction => transaction.UserId == userId && transaction.Type == "Income" && transaction.Date >= startDate && transaction.Date <= endDate)
+        .SumAsync(transaction => transaction.Amount);
+
+  public async Task<decimal> GetTotalExpenseAsync(Guid userId, DateTime startDate, DateTime endDate) =>
+    await _db.Transactions
+      .Where(transaction => transaction.UserId == userId && transaction.Type == "Expense" && transaction.Date >= startDate && transaction.Date <= endDate)
+        .SumAsync(transaction => transaction.Amount);
+
 }

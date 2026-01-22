@@ -62,6 +62,7 @@ builder.Services.AddScoped<FinanceTracker.Infrastructure.Repositories.Interfaces
 builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.ICategoryService, FinanceTracker.Application.Services.CategoryService>();
 builder.Services.AddScoped<FinanceTracker.Infrastructure.Repositories.Interfaces.ITransactionRepository, FinanceTracker.Infrastructure.Repositories.TransactionRepository>();
 builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.ITransactionService, FinanceTracker.Application.Services.TransactionService>();
+builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.IDashboardService, FinanceTracker.Application.Services.DashboardService>();
 
 var app = builder.Build();
 
@@ -74,6 +75,7 @@ app.MapAuthEndpoints();
 app.MapAccountEndpoints();
 app.MapCategoryEndpoints();
 app.MapTransactionEndpoints();
+app.MapDashboardEndpoints();
 
 using (var scope = app.Services.CreateScope())
 {

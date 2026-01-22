@@ -30,4 +30,9 @@ public class AccountRepository : IAccountRepository
           (transaction.Type == "Expense" && transaction.FromAccountId == accountId ? transaction.Amount : 0) -
           (transaction.Type == "Transfer" && transaction.FromAccountId == accountId ? transaction.Amount : 0)
         );
+  
+  public async Task<decimal> GetTotalBalanceAsync(Guid userId) => 
+    await _db.Transactions
+      .Where(transaction => transaction.UserId == userId)
+        .SumAsync(transaction => transaction.Type == "Income" ? transaction.Amount : transaction.Type == "Expense" ? -transaction.Amount : 0);
 }
