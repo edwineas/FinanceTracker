@@ -14,9 +14,9 @@ public static class DashboardEndpoints
     {
       var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
 
-      var (totalBalance, totalIncome, totalExpence, netSaving) = await dashboardService.getSummary(userId);
+      var (totalBalance, totalIncome, totalExpense, netSavings) = await dashboardService.getSummary(userId);
 
-      return ApiResults.Ok(new {totalBalance, totalIncome, totalExpence, netSaving}, "Ok");
+      return ApiResults.Ok(new {totalBalance, totalIncome, totalExpense, netSavings}, "Ok");
     });
 
     return app;

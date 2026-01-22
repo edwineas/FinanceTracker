@@ -13,7 +13,7 @@ public class DashboardService : IDashboardService
     _accountRepo = accountRepo;
     _transactionRepo = transactionRepo;
   }
-  public async Task<(decimal totalBalance, decimal totalIncome, decimal totalExpense, decimal netSaving)> getSummary(Guid useId)
+  public async Task<(decimal totalBalance, decimal totalIncome, decimal totalExpense, decimal netSavings)> getSummary(Guid useId)
   {
     var now = DateTime.UtcNow;
     var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
