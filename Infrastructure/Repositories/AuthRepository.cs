@@ -22,4 +22,6 @@ public class AuthRepository : IAuthRepository
   {
     return await _db.Users.FirstOrDefaultAsync(user => user.Email == email);
   }
+
+  public async Task<User?> GetUserByIdAsync(Guid userId) => await _db.Users.FirstOrDefaultAsync(user => user.Id == userId);
 }

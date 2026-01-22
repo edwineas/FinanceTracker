@@ -63,6 +63,7 @@ builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.ICateg
 builder.Services.AddScoped<FinanceTracker.Infrastructure.Repositories.Interfaces.ITransactionRepository, FinanceTracker.Infrastructure.Repositories.TransactionRepository>();
 builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.ITransactionService, FinanceTracker.Application.Services.TransactionService>();
 builder.Services.AddScoped<FinanceTracker.Application.Services.Interfaces.IDashboardService, FinanceTracker.Application.Services.DashboardService>();
+builder.Services.AddScoped<FinanceTracker.Infrastructure.Repositories.Interfaces.IRefreshTokenRepository, FinanceTracker.Infrastructure.Repositories.RefreshTokenRepository>();
 
 var app = builder.Build();
 

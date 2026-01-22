@@ -15,19 +15,21 @@ public class AuthService : IAuthService
   private readonly IAuthRepository _repo;
   private readonly IPasswordHasher<User> _passwordHasher;
   private readonly IConfiguration _config;
+  private readonly IRefreshTokenRepository _refreshTokenRepo;
 
-  public AuthService(IAuthRepository repo, IPasswordHasher<User> passwordHasher, IConfiguration config)
+  public AuthService(IAuthRepository repo, IPasswordHasher<User> passwordHasher, IConfiguration config, IRefreshTokenRepository refreshTokenRepo)
   {
     _repo = repo;
     _passwordHasher = passwordHasher;
     _config = config;
+    _refreshTokenRepo = refreshTokenRepo;
   }
 
-  public async Task<(bool Success, object? Error, string? Token)> RegisterUserAsync(RegisterUserRequest request)
+  public async Task<(bool Success, object? Error, string? AccessToken, string? RefreshToken)> RegisterUserAsync(RegisterUserRequest request)
   {
     if (await _repo.EmailExistsAsync(request.Email))
     {
-      return (false, new {Email = new[] {"User already exists"}}, null);
+      return (false, new {Email = new[] {"User already exists"}}, null, null);
     }
 
     var user = new User
@@ -41,22 +43,42 @@ public class AuthService : IAuthService
     user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
     await _repo.AddUserAsync(user);
 
-    var token = GenerateJwtToken(user);
-    return (true, null, token);
+    var accessToken = GenerateJwtToken(user);
+    var refreshToken = GenerateRefreshToken();
+    await _refreshTokenRepo.AddAsync(new RefreshToken { Token = refreshToken, UserId = user.Id, ExpiresAt = DateTime.UtcNow.AddDays(30) });
+
+    return (true, null, accessToken, refreshToken);
   }
 
-  public async Task<(bool Success, string? Token)> LoginUserAsync(LoginUserRequest request)
+  public async Task<(bool Success, string? AccessToken, string? RefreshToken)> LoginUserAsync(LoginUserRequest request)
   {
     var user = await _repo.GetUserByEmailAsync(request.Email);
 
-    if (user == null) return (false, null);
+    if (user == null) return (false, null, null);
 
     var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
-    if (result == PasswordVerificationResult.Failed) return (false, null);
+    if (result == PasswordVerificationResult.Failed) return (false, null, null);
 
-    var token = GenerateJwtToken(user);
+    var accessToken = GenerateJwtToken(user);
+    var refreshToken = GenerateRefreshToken();
+    await _refreshTokenRepo.AddAsync(new RefreshToken { Token = refreshToken, UserId = user.Id, ExpiresAt = DateTime.UtcNow.AddDays(30) });
 
-    return (true, token);
+    return (true, accessToken, refreshToken);
+  }
+
+  public async Task<(bool Success, string? AccessToken)> RefreshTokenAsync(string refreshToken)
+  {
+    var storedToken = await _refreshTokenRepo.GetByTokenAsync(refreshToken);
+    if (storedToken == null || storedToken.ExpiresAt < DateTime.UtcNow)
+    {
+      return (false, null);
+    }
+
+    var user = await _repo.GetUserByIdAsync(storedToken.UserId);
+    if (user == null) return (false, null);
+
+    var newAccessToken = GenerateJwtToken(user);
+    return (true, newAccessToken);
   }
 
   private string GenerateJwtToken(User user)
@@ -83,4 +105,6 @@ public class AuthService : IAuthService
     var token = tokenHandler.CreateToken(tokenDescriptor);
     return tokenHandler.WriteToken(token);
   }
+
+  private string GenerateRefreshToken() => Guid.NewGuid().ToString() + Guid.NewGuid().ToString();
 }
