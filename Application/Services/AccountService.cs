@@ -77,7 +77,8 @@ public class AccountService : IAccountService
     {
       Name = account.Name,
       Type = account.Type,
-      Balance = balances[account.Id]
+      Balance = balances[account.Id],
+      CreatedAt = account.CreatedAt
     }).ToList();
   }
 }
