@@ -13,6 +13,7 @@ public class Transaction
   public DateTime Date { get; set; }
   public DateTime CreatedAt { get; set; }
 
+  public User? User { get; set; }
   public Category? Category { get; set; }
   public Account? FromAccount { get; set; }
   public Account? ToAccount { get; set; }

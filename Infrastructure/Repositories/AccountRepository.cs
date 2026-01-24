@@ -35,4 +35,14 @@ public class AccountRepository : IAccountRepository
     await _db.Transactions
       .Where(transaction => transaction.UserId == userId)
         .SumAsync(transaction => transaction.Type == "Income" ? transaction.Amount : transaction.Type == "Expense" ? -transaction.Amount : 0);
+
+  public async Task DeleteAsync(Guid accountId)
+  {
+    var account = await _db.Accounts.FindAsync(accountId);
+    if (account != null)
+    {
+      _db.Accounts.Remove(account);
+      await _db.SaveChangesAsync();
+    }
+  }
 }

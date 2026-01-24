@@ -10,4 +10,5 @@ public interface IAccountService
   Task<List<Account>> GetAllAsync(Guid userId);
   Task<decimal?> GetBalanceAsync(Guid accountId, Guid userId);
   Task<List<AccountWithBalanceResponse>> GetAllWithBalancesAsync(Guid userId);
+  Task<(bool Success, string? Error )> DeleteAsync(Guid accountId, Guid userId);
 }

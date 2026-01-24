@@ -44,6 +44,8 @@ namespace FinanceTracker.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Accounts");
                 });
 
@@ -64,6 +66,8 @@ namespace FinanceTracker.Infrastructure.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Categories");
                 });
@@ -139,6 +143,8 @@ namespace FinanceTracker.Infrastructure.Data.Migrations
 
                     b.HasIndex("ToAccountId");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Transactions");
                 });
 
@@ -168,6 +174,28 @@ namespace FinanceTracker.Infrastructure.Data.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("FinanceTracker.Domain.Entities.Account", b =>
+                {
+                    b.HasOne("FinanceTracker.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FinanceTracker.Domain.Entities.Category", b =>
+                {
+                    b.HasOne("FinanceTracker.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FinanceTracker.Domain.Entities.RefreshToken", b =>
                 {
                     b.HasOne("FinanceTracker.Domain.Entities.User", "User")
@@ -183,21 +211,32 @@ namespace FinanceTracker.Infrastructure.Data.Migrations
                 {
                     b.HasOne("FinanceTracker.Domain.Entities.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryId");
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("FinanceTracker.Domain.Entities.Account", "FromAccount")
                         .WithMany()
-                        .HasForeignKey("FromAccountId");
+                        .HasForeignKey("FromAccountId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("FinanceTracker.Domain.Entities.Account", "ToAccount")
                         .WithMany()
-                        .HasForeignKey("ToAccountId");
+                        .HasForeignKey("ToAccountId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("FinanceTracker.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Category");
 
                     b.Navigation("FromAccount");
 
                     b.Navigation("ToAccount");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

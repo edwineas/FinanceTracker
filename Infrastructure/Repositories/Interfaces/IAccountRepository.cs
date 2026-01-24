@@ -9,4 +9,5 @@ public interface IAccountRepository
   Task<bool> ExistsAsync(Guid accountId, Guid userId);
   Task<decimal> GetBalanceAsync(Guid accountId, Guid userId);
   Task<decimal> GetTotalBalanceAsync(Guid userId);
+  Task DeleteAsync(Guid accountId);
 }

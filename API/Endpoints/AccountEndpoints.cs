@@ -43,6 +43,14 @@ public static class AccountEndpoints
       return ApiResults.Ok(new { accounts });
     });
 
+    group.MapDelete("/{id}", async (Guid id, ClaimsPrincipal user, IAccountService accountService) =>
+    {
+      var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+      var (success, error) = await accountService.DeleteAsync(id, userId);
+      if (!success) return ApiResults.Conflict(error!);
+      return ApiResults.Deleted();
+    });
+
     return app;
   }
 }

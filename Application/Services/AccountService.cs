@@ -81,4 +81,13 @@ public class AccountService : IAccountService
       CreatedAt = account.CreatedAt
     }).ToList();
   }
+
+  public async Task<(bool Success, string? Error)> DeleteAsync(Guid accountId, Guid userId)
+  {
+    var exists = await _repo.ExistsAsync(accountId, userId);
+    if (!exists) return (false, "Account not found");
+
+    await _repo.DeleteAsync(accountId);
+    return (true, null);
+  }
 }

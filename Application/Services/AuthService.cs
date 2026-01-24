@@ -45,7 +45,7 @@ public class AuthService : IAuthService
 
     var accessToken = GenerateJwtToken(user);
     var refreshToken = GenerateRefreshToken();
-    await _refreshTokenRepo.AddAsync(new RefreshToken { Token = refreshToken, UserId = user.Id, ExpiresAt = DateTime.UtcNow.AddDays(30) });
+    await _refreshTokenRepo.AddAsync(new RefreshToken { Token = refreshToken, UserId = user.Id, ExpiresAt = DateTime.UtcNow.AddDays(30), CreatedAt = DateTime.UtcNow });
 
     return (true, null, accessToken, refreshToken);
   }
@@ -61,7 +61,7 @@ public class AuthService : IAuthService
 
     var accessToken = GenerateJwtToken(user);
     var refreshToken = GenerateRefreshToken();
-    await _refreshTokenRepo.AddAsync(new RefreshToken { Token = refreshToken, UserId = user.Id, ExpiresAt = DateTime.UtcNow.AddDays(30) });
+    await _refreshTokenRepo.AddAsync(new RefreshToken { Token = refreshToken, UserId = user.Id, ExpiresAt = DateTime.UtcNow.AddDays(30), CreatedAt = DateTime.UtcNow });
 
     return (true, accessToken, refreshToken);
   }
