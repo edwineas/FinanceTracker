@@ -7,4 +7,5 @@ public interface ICategoryRepository
   Task AddAsync(Category category);
   Task<List<Category>> GetAllByUserAsync(Guid userId);
   Task<bool> ExistsAsync(Guid id, Guid userId);
+  Task DeleteAsync(Guid categoryId);
 }

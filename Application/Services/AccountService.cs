@@ -75,6 +75,7 @@ public class AccountService : IAccountService
 
     return accounts.Select(account => new AccountWithBalanceResponse
     {
+      Id = account.Id,
       Name = account.Name,
       Type = account.Type,
       Balance = balances[account.Id],

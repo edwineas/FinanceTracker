@@ -20,4 +20,14 @@ public class CategoryRepository : ICategoryRepository
   public async Task<List<Category>> GetAllByUserAsync(Guid userId) => await _db.Categories.Where(category => category.UserId == userId).ToListAsync();
 
   public async Task<bool> ExistsAsync(Guid id, Guid userId) => await _db.Categories.AnyAsync(category => category.Id == id && category.UserId == userId);
+
+  public async Task DeleteAsync(Guid categoryId)
+  {
+    var category = await _db.Categories.FindAsync(categoryId);
+    if (category != null)
+    {
+      _db.Categories.Remove(category);
+      await _db.SaveChangesAsync();
+    }
+  }
 }

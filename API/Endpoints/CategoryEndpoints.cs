@@ -28,6 +28,14 @@ public static class CategoryEndpoints
       return ApiResults.Ok(categories);
     });
 
+    group.MapDelete("/{id}", async (Guid id, ClaimsPrincipal user, ICategoryService categoryService) =>
+    {
+      var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+      var (success, error) = await categoryService.DeleteAsync(id, userId);
+      if (!success) return ApiResults.Conflict(error!);
+      return ApiResults.Deleted();
+    });
+
     return app;
   }
 }
