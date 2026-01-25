@@ -62,8 +62,18 @@ public class TransactionRepository : ITransactionRepository
       .ToListAsync();
 
   public async Task<Transaction?> GetByIdAsync(Guid transactionId) =>
-    await _db.Transactions.FirstOrDefaultAsync(t => t.Id == transactionId);
+    await _db.Transactions.FindAsync(transactionId);
 
   public async Task UpdateAsync(Transaction transaction) { _db.Transactions.Update(transaction); await _db.SaveChangesAsync(); }
+
+  public async Task DeleteAsync(Guid transactionId)
+  {
+    var transaction = await _db.Transactions.FindAsync(transactionId);
+    if (transaction != null)
+    {
+      _db.Transactions.Remove(transaction);
+      await _db.SaveChangesAsync();
+    }
+  }
 
 }

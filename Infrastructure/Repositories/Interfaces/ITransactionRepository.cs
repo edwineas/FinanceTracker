@@ -13,4 +13,5 @@ public interface ITransactionRepository
   Task<List<Transaction>> GetLatestAsync(Guid userId, int limit);
   Task<Transaction?> GetByIdAsync(Guid transactionId);
   Task UpdateAsync(Transaction transaction);
+  Task DeleteAsync(Guid transactionId);
 }

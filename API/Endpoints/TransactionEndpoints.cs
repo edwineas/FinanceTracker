@@ -61,6 +61,17 @@ public static class TransactionEndpoints
       return ApiResults.Ok(transaction);
     }); 
 
+    group.MapDelete("/{id}", async (Guid id, ClaimsPrincipal user, ITransactionService transactionService) =>
+    {
+      var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+
+      var (success, error) = await transactionService.DeleteAsync(id, userId);
+
+      if (!success) ApiResults.Conflict("Transaction Deletion Failed", error);
+
+      return ApiResults.Deleted();
+    });
+
     return app;
   }
 }

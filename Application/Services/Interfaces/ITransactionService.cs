@@ -10,4 +10,5 @@ public interface ITransactionService
   Task<(bool Success, object? Error, Transaction? Transaction)> UpdateAsync(UpdateTransactionRequest request, Guid userId);
   Task<(bool success, object? Error, List<TransactionListingResponse>? transactions)> GetAllAsync(Guid userId, string? type, Guid? accountId, Guid? categoryId, DateTime? startDate, DateTime? endDate);
   Task<List<TransactionSummaryResponse>> GetLatestAsync(Guid userId, int limit);
+  Task<(bool Success, string? Error)> DeleteAsync(Guid transactionId, Guid userId);
 }

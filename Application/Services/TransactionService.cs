@@ -150,4 +150,16 @@ public class TransactionService : ITransactionService
       }
     }).ToList();
   }
+
+  public async Task<(bool Success, string? Error)> DeleteAsync(Guid transactionId, Guid userId)
+  {
+    var existingTransaction = await _repo.GetByIdAsync(transactionId);
+    if (existingTransaction == null || existingTransaction.UserId != userId)
+    {
+      return (false, "Transaction not found");
+    }
+
+    await _repo.DeleteAsync(transactionId);
+    return (true, null);
+  }
 }
