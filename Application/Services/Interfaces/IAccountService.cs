@@ -7,7 +7,7 @@ namespace FinanceTracker.Application.Services.Interfaces;
 public interface IAccountService
 {
   Task<Account> CreateAsync(CreateAccountRequest request, Guid userId);
-  Task<List<Account>> GetAllAsync(Guid userId);
+  Task<List<AccountListingResponse>> GetAllAsync(Guid userId);
   Task<decimal?> GetBalanceAsync(Guid accountId, Guid userId);
   Task<List<AccountWithBalanceResponse>> GetAllWithBalancesAsync(Guid userId);
   Task<(bool Success, string? Error )> DeleteAsync(Guid accountId, Guid userId);

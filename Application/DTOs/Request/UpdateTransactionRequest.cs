@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace FinanceTracker.Application.DTOs.Request;
-public class CreateTransactionRequest : IValidatableObject
+
+public class UpdateTransactionRequest
 {
   [Required]
+  public Guid Id { get; set; }
+  [Required]
   public string Type { get; set; } = string.Empty;
-
   [Required][Range(typeof(decimal), "0.01", "79228162514264337593543950335", ErrorMessage = "Amount should be greater than 0")]
   public decimal? Amount { get; set; }
   public Guid? FromAccount { get; set; }
@@ -65,4 +67,5 @@ public class CreateTransactionRequest : IValidatableObject
       }
     }
   }
+
 }

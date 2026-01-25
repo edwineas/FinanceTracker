@@ -32,7 +32,17 @@ public class AccountService : IAccountService
     return account;
   }
 
-  public async Task<List<Account>> GetAllAsync(Guid userId) => await _repo.GetByUserAsync(userId);
+  public async Task<List<AccountListingResponse>> GetAllAsync(Guid userId)
+  {
+    var accounts = await _repo.GetByUserAsync(userId);
+    return accounts.Select(account => new AccountListingResponse
+    {
+      Id = account.Id,
+      Name = account.Name,
+      Type = account.Type
+    }).ToList();
+  }
+
 
   public async Task<decimal?> GetBalanceAsync(Guid accountId, Guid userId)
   {

@@ -24,11 +24,11 @@ public static class TransactionEndpoints
 
     group.MapGet("/", async (
       string? type,
-      Guid? accountId, 
+      Guid? accountId,
       Guid? categoryId,
       DateTime? startDate,
       DateTime? endDate,
-      ClaimsPrincipal user, 
+      ClaimsPrincipal user,
       ITransactionService transactionService
       ) =>
     {
@@ -49,6 +49,17 @@ public static class TransactionEndpoints
 
       return ApiResults.Ok(transactions);
     });
+
+    group.MapPut("/", async (UpdateTransactionRequest updatedTransaction, ClaimsPrincipal user, ITransactionService transactionService) =>
+    {
+      var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+
+      var (success, error, transaction) = await transactionService.UpdateAsync(updatedTransaction, userId);
+
+      if (!success) return ApiResults.BadRequest("Transaction Update Failed", error);
+
+      return ApiResults.Ok(transaction);
+    }); 
 
     return app;
   }

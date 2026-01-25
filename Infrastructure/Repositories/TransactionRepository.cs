@@ -23,11 +23,17 @@ public class TransactionRepository : ITransactionRepository
 
     if (!string.IsNullOrWhiteSpace(type)) query = query.Where(transaction => transaction.Type == type);
     if (accountId.HasValue) query = query.Where(transaction => transaction.FromAccountId == accountId || transaction.ToAccountId == accountId);
-    if (categoryId.HasValue) query = query.Where(transaction => transaction.FromAccountId == accountId || transaction.ToAccountId == accountId);
+    if (categoryId.HasValue) query = query.Where(transaction => transaction.CategoryId == categoryId);
     if (startDate.HasValue) query = query.Where(transaction => transaction.Date >= startDate);
     if (endDate.HasValue) query = query.Where(transaction => transaction.Date <= endDate);
 
-    return await query.OrderByDescending(transaction => transaction.Date).ToListAsync();
+    return await query
+      .OrderByDescending(transaction => transaction.Date)
+      .Include(transaction => transaction.Category)
+      .Include(transaction => transaction.FromAccount)
+      .Include(transaction => transaction.ToAccount)
+      .ToListAsync();
+
   }
 
   public async Task<decimal> GetTotalIncomeAsync(Guid userId, DateTime startDate, DateTime endDate) =>
@@ -54,4 +60,10 @@ public class TransactionRepository : ITransactionRepository
       .OrderByDescending(transaction => transaction.Date)
       .Take(limit)
       .ToListAsync();
+
+  public async Task<Transaction?> GetByIdAsync(Guid transactionId) =>
+    await _db.Transactions.FirstOrDefaultAsync(t => t.Id == transactionId);
+
+  public async Task UpdateAsync(Transaction transaction) { _db.Transactions.Update(transaction); await _db.SaveChangesAsync(); }
+
 }
